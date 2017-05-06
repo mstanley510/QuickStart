@@ -1,0 +1,10 @@
+- error handling service
+- formatting using preferences
+- pricing sheet
+- view-context architecture
+- change expirations to combinelatest with volserver service
+- re-write DTETicker to use observable.interval
+- refactor error handling in data-service/future-price-server/vol-server services
+- investigate CLI and deployment
+
+- Add GBlackScholes and hook up in BSAmerican

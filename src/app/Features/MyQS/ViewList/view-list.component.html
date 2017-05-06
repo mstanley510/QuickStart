@@ -1,0 +1,42 @@
+      
+      
+    <span *ngFor="let viewItem of Items">
+        <span *ngIf="viewItem.constructor.name == 'ViewItem'">
+            <button class="" routerLink="{{viewItem.Route + '/' + viewItem.ID}}">{{viewItem.Name}}</button>
+        </span>
+        <span *ngIf="viewItem.constructor.name == 'ViewGroup'">
+            <div ngbDropdown class="d-inline-block">
+                <button class="" ngbDropdownToggle>{{viewItem.Name}}</button>
+                <div class="dropdown-menu">
+                    <button class="dropdown-item" *ngFor="let viewItem2 of viewItem.ViewItems" routerLink="{{viewItem2.Route + '/' + viewItem2.ID}}">{{viewItem2.Name}}</button>
+                </div>
+            </div>
+        </span>
+    </span>
+
+
+    <!--<div>
+
+        <button class="" type="button">View1</button>
+        <button class="" type="button">View2</button>
+        <button class="" type="button">View3</button>
+
+        <div ngbDropdown class="d-inline-block">
+            <button class="" id="ddg1" ngbDropdownToggle>Eurodollars</button>
+            <div class="dropdown-menu" aria-labelledby="ddg1">
+            <button class="dropdown-item">View1</button>
+            <button class="dropdown-item">View2</button>
+            <button class="dropdown-item">View3</button>
+            </div>
+        </div>
+
+        <div ngbDropdown class="d-inline-block">
+            <button class="" id="ddg2" ngbDropdownToggle>WTI Crude</button>
+            <div class="dropdown-menu" aria-labelledby="ddg2">
+            <button class="dropdown-item">View1</button>
+            <button class="dropdown-item">View2</button>
+            <button class="dropdown-item">View3</button>
+            </div>
+        </div>
+
+    </div>-->
