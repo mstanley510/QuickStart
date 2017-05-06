@@ -51,7 +51,7 @@ export class GetProductsComponent implements OnInit, OnDestroy
     }
 
     ngOnInit(): void {
-        this.subscription = this.dataStore.Products.subscribe(products => this.products = products), error => this.errorMessage = <any>error);
+        this.subscription = this.dataStore.Products.subscribe(products => this.products = products, error => this.errorMessage = <any>error);
     }
 
     ngOnDestroy(): void{

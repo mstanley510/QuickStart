@@ -8,3 +8,5 @@
 - investigate CLI and deployment
 
 - Add GBlackScholes and hook up in BSAmerican
+
+- Investigate ViewContainers https://angular-2-training-book.rangle.io/handout/advanced-angular/directives/view_containers_and_embedded_views.html
