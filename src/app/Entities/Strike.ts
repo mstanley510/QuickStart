@@ -6,6 +6,7 @@ import {Results} from "./../PricingModels/pricing-model"
 export class Strike
 {
     Expiration: Expiration;
+    ExpirationId: number;
     ID: number;
     StrikePrice: number;
     SettleVol:number;
@@ -22,7 +23,7 @@ export class Strike
     }
 
     get Vol():number{
-
+        
         if (this.Expiration.VolCurves.Strike.Current == null)
             return 0;
 
@@ -59,6 +60,7 @@ export class Strike
 export interface IStrike
 {
     StrikeId: number;
+    ExpirationId: number;
     StrikePrice: number;
     SettleCall: number;
     SettlePut: number;

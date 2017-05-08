@@ -1,5 +1,8 @@
 import { Observable } from 'rxjs/Observable';
 import { Observer } from 'rxjs/Observer';
+import 'rxjs/add/operator/concat';
+import 'rxjs/add/operator/filter';
+import 'rxjs/add/operator/withLatestFrom';
 
 import { DataService } from '../Services/data-service.service';
 
@@ -19,77 +22,110 @@ export class Product
     ModelType:ModelType;
     IsIndexed:boolean;
 
+    useLiveFutures = true;
+    useLiveVolatility = true;
     futureRefreshInterval: number = 3000;
-    volRefreshInterval: number = 3000;
+    volRefreshInterval: number = 5000;
 
      _futures:Future[] = null;
     get Futures(): Observable<Future[]> {
 
         if (this._futures == null)
-            return this.dataService.getFutures(this).map(futures => this._futures = futures);
+        {
+            if (this.useLiveFutures)
+            {
+                console.log('Calling server for product ' + this.ID + ' LIVE futures...')
+                return Observable.combineLatest(
+                    this.dataService.getFutures(this).map(futures => this._futures = futures), 
+                    this.dataService.getFuturePrices(this, this.futureRefreshInterval),
+                    this.mergeFuturePrices);
+            }
 
-        console.log('Getting product ' + this.ID + ' futures from cache....');
+            console.log('Getting product ' + this.ID + ' STATIC futures from cache...');
+            return this.dataService.getFutures(this).map(futures => this._futures = futures);
+        }
+
+        if (this.useLiveFutures)
+        {
+            console.log('Calling server for product ' + this.ID + ' LIVE futures ....');
+            return Observable.combineLatest(
+                Observable.of(this._futures), 
+                this.dataService.getFuturePrices(this, this.futureRefreshInterval),
+                this.mergeFuturePrices);
+        }
+
+        console.log('Getting product ' + this.ID + ' STATIC futures from cache...');
         return Observable.of(this._futures);
     }
 
-    get LiveFutures():Observable<Future[]>{
-        return Observable.combineLatest(
-            this.Futures, 
-            this.dataService.getFuturePrices(this, this.futureRefreshInterval),
-            this.mergeFuturePrices);
-    }
-
     mergeFuturePrices(futures:Future[], prices:FuturePrice[]):Future[]{
+        console.log('Merging future prices...');
         futures.forEach((f: Future) => {
             f.Prices = prices.find(x => x.Symbol == f.Symbol)
-            //console.log('Set future price for ' + f.Symbol + ' on ' + f.Prices);
         });
         return futures;
     }
 
-    private _expirations:Expiration[] = null;
+     _expirations:Expiration[] = null;
     get Expirations(): Observable<Expiration[]>{
 
         if (this._expirations == null)
         {
-            //Need to ensure futures are in the cache....so concat the Futures stream with the Expirations then filter out the futures
-            //Maybe there is an easier way???
-            return this.Futures
-                .concat(this.dataService.getExpirations(this).map(expirations => this._expirations = expirations))
-                .filter((x, i) => { 
-                    if (x.length > 0)
-                        return x[0] instanceof Expiration;
-                    return false;})
+            if (this.useLiveVolatility)
+            {
+                console.log('Calling server for product ' + this.ID + ' LIVE expirations...');
+                return Observable.combineLatest(
+                    this.Futures,
+                    this.dataService.getExpirations(this).map(expirations => this._expirations = expirations),
+                    this.dataService.getVolatility(this),
+                    (futures, expirations, volatility) => { return this.mergeVolatility(expirations, volatility);}
+                );
+            }
+
+            console.log('Calling server for product ' + this.ID + ' STATIC expirations ...');
+            return Observable.combineLatest(
+                this.Futures,
+                this.dataService.getExpirations(this).map(expirations => this._expirations = expirations),
+                (futures, expirations) => { return expirations;}
+            );
         }
 
-        console.log('Getting product ' + this.ID + ' expirations from cache....');
-        return Observable.of(this._expirations);
+        if (this.useLiveVolatility)
+        {
+            //There is an extra merge Volatility being called here.
+            //It is due to the fact that a FuturePrice update causes a new sequence element to emit but I can't
+            //tell the difference between a FuturePrice update and a volatility update so I have to run the mergeVolatility
+            //routine all the time......not smart enough to figure out a way around it. NOTE: tried the .withLatestFrom below but had no effect.
+            
+            console.log('Getting product ' + this.ID + ' LIVE expirations from cache...');
+            return Observable.combineLatest(
+                this.Futures,
+                Observable.of(this._expirations),
+                this.dataService.getVolatility(this),
+                (futures, expirations, volatility) => { return this.mergeVolatility(expirations, volatility);}
+            );
+
+
+            // return Observable.combineLatest(
+            //     Observable.of(this._expirations),
+            //     this.dataService.getVolatility(this),
+            //     (expirations, volatility) => {return this.mergeVolatility(expirations, volatility);})
+            //     .withLatestFrom(this.Futures, (s1, s2) => {return s1});
+        }
+
+        console.log('Getting product ' + this.ID + ' STATIC expirations from cache....');
+        return Observable.combineLatest(
+            this.Futures,
+            Observable.of(this._expirations),
+            (futures, expirations) => { return expirations;});
     }
 
-    get LiveExpirations(): Observable<Expiration[]>{
+    mergeVolatility(expirations:Expiration[], curves:Curves[]):Expiration[]{
+        console.log('Merging volatility...');
+        expirations.forEach((e: Expiration) => {
+            e.VolCurves = curves.find(x => x.ExpirationId == e.ID)});
 
-        let o1 = this.Expirations;
-        let o2 = this.dataService.getVolatility(this, this.volRefreshInterval);
-
-        return Observable.combineLatest(
-            o1, 
-            o2, 
-            function(expirations, curves) {
-
-                if (expirations.length == 0)
-                    return expirations;
-
-                expirations.forEach((e: Expiration) => {
-                    e.VolCurves = curves.find(x => x.ExpirationId == e.ID)});
-
-                // strikes.forEach((x) => {
-
-                //     x.Call.ensureCalcs = false;
-                //     x.Put.ensureCalcs = false;
-                // });
-
-                return expirations;
-            });
+        return expirations;
     }
 
     constructor (private dataService: DataService){

@@ -1,4 +1,5 @@
 import { Observable } from 'rxjs/Observable';
+import 'rxjs/add/observable/of';
 
 import { DataService } from '../Services/data-service.service';
 
@@ -18,45 +19,33 @@ export class Expiration
     Description: string;
     ExpirationDate : Date;
     InterestRate: number;
+    UnderlyingSymbol:string;
 
     VolCurves:Curves;
 
-    private _strikes:Strike[] = null;
+    _strikes:Strike[] = null;
     get Strikes(): Observable<Strike[]>{
 
         if (this._strikes == null)
             return this.dataService.getStrikes(this).map(strikes => this._strikes = strikes);
 
-        return Observable.of(this._strikes);
-    }
+        return Observable.of(this._strikes).map(strikes => {
+            strikes.forEach(strike => {
+                strike.Call.ensureCalcs = false;
+                strike.Put.ensureCalcs = false;
+            });
+            return strikes;
+        });
+        // if (this._strikes == null)
+        //     return Observable.combineLatest(
+        //         this.dataService.getStrikes(this).map(strikes => this._strikes = strikes),
+        //         this.Product.Futures,
+        //         (v1, v2) => {return v1;});
 
-    private _liveStrikes:Strike[] = null;
-    get LiveStrikes(): Observable<Strike[]>{
-
-        let o1 = this.Strikes;
-        let o2 = this.dataService.getFuturePrices(this.Product, this.Product.futureRefreshInterval);
-
-        return Observable.combineLatest(
-            o1, 
-            o2, 
-            function(strikes, futurePrices) {
-
-                if (strikes.length == 0)
-                    return strikes;
-
-                let ex = strikes[0].Expiration;
-                let p = ex.Product;
-                p.mergeFuturePrices(p._futures, futurePrices);
-                console.log('merged future prices...');       
-
-                strikes.forEach((x) => {
-
-                    x.Call.ensureCalcs = false;
-                    x.Put.ensureCalcs = false;
-                });
-
-                return strikes;
-            }).map(strikes => this._liveStrikes = strikes);
+        // return Observable.combineLatest(
+        //     Observable.of(this._strikes),
+        //     this.Product.Futures,
+        //     (v1, v2) => {return v1;});
     }
 
     constructor (private dataService: DataService){
@@ -65,6 +54,10 @@ export class Expiration
 
     get DTE():number{
         return (this.ExpirationDate.getTime() - new Date().getTime()) / 86400000;
+    }
+
+    get ATMVol():number{
+        return this.VolCurves.Moneyness.Current == null ? 0 : this.VolCurves.Moneyness.Current.F(0);
     }
 
     get ATMSettle():Strike{

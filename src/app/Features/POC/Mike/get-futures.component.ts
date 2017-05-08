@@ -2,6 +2,8 @@ import { Component, OnInit, OnDestroy, Input } from '@angular/core';
 
 import { Subscription } from 'rxjs/subscription';
 
+import { DataStore } from '../../../Services/data-store.service';
+
 import { Product } from "../../../Entities/Product";
 import { Future } from "../../../Entities/Future";
 import { FuturePrice } from "../../../Entities/FuturePrice";
@@ -46,7 +48,7 @@ export class GetFuturesComponent implements OnInit, OnDestroy {
     private errorMessage: string;
     private subscription: Subscription;
 
-    constructor(){
+    constructor(private dataStore: DataStore){
     }
 
     ngOnInit(): void {
@@ -60,7 +62,13 @@ export class GetFuturesComponent implements OnInit, OnDestroy {
 
     loadFutures(product:Product): void{
         if (product != null)
-            this.subscription = product.LiveFutures.subscribe(futures => this.futures = futures, error => this.errorMessage = <any>error);
+            //this.subscription = this.dataStore.getProduct(product.ID).subscribe(x => this.setFutures(x), error => this.errorMessage = <any>error);
+            this.subscription = product.Futures.subscribe(futures => this.futures = futures, error => this.errorMessage = <any>error);
+    }
+
+    setFutures(product:Product):void{
+        console.log('received new ....');
+        this.futures = product._futures;
     }
 
     ngOnDestroy(): void{

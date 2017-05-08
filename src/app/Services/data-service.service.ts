@@ -1,7 +1,7 @@
 import { Injectable }   from '@angular/core';
 import { Http, Response } from '@angular/http';
 
-import { Observable } from 'rxjs/Rx';
+import { Observable } from 'rxjs/observable';
 import 'rxjs/add/operator/catch';
 import 'rxjs/add/operator/take';
 import 'rxjs/add/operator/merge';
@@ -43,7 +43,7 @@ export class DataService {
     private extractProductData(res: Response) 
     {
         let data = res.json() || [];
-
+        console.log("Extracting products...");
         let products = new Array<Product>();
         data.forEach((p: IProduct) => {products.push(Product.fromIProduct(p, this))});
         return products;
@@ -71,7 +71,7 @@ export class DataService {
 
     getFuturePrices(product: Product, interval: number): Observable<FuturePrice[]>
     {
-        return this.futurePriceServer.getFuturePrices(product.ID, interval);
+        return this.futurePriceServer.getFuturePrices(product);
     }
 
     //-------------------------- Expirations --------------------------------------------
@@ -94,9 +94,10 @@ export class DataService {
         return expirations;
     }
 
-    getVolatility(product: Product, interval: number): Observable<Curves[]>{
-        return this.volServer.getVolatility(product, interval);
+    getVolatility(product: Product): Observable<Curves[]>{
+        return this.volServer.getVolatility(product);
     }
+
     //--------------------------- Strikes --------------------------------------------------
     getStrikes(expiration: Expiration): Observable<Strike[]>
     {
@@ -116,6 +117,23 @@ export class DataService {
         return strikes;
     }
 
+    // getAllStrikes(productId:number): Observable<Strike[]>
+    // {
+    //     this.logger.log('Getting product ' + productId + ' strikes from server...');
+    //     return this.http.get(this.config.dataUrl + 'GetAllStrikes/' + productId)
+    //         .map(x => this.extractStrikeData2(x))
+    //         .catch(this.handleError);    
+    // }
+
+    // private extractStrikeData2(res: Response) 
+    // {
+    //     let data = res.json() || [];
+
+    //     //Convert 
+    //     let strikes = new Array<Strike>();
+    //     data.forEach((s: IStrike) => {strikes.push(Strike.fromIStrike2(s))});
+    //     return strikes;
+    // }
 
 
 

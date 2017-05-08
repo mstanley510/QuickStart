@@ -1,7 +1,10 @@
 import { Injectable }   from '@angular/core';
 import { Http, Response } from '@angular/http';
 
-import { Observable } from 'rxjs/Rx';
+import { Observable } from 'rxjs/observable';
+import 'rxjs/add/observable/interval';
+import 'rxjs/add/observable/merge';
+import 'rxjs/add/operator/mergeMap';
 import 'rxjs/add/operator/merge';
 import 'rxjs/add/operator/map';
 

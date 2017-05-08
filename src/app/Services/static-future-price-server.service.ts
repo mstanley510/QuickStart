@@ -1,13 +1,14 @@
 import { Injectable }   from '@angular/core';
 import { Http, Response } from '@angular/http';
 
-import { Observable } from 'rxjs/Rx';
+import { Observable } from 'rxjs/observable';
 import 'rxjs/add/operator/map';
 
 import {Logger} from './logger.service';
 import {Config} from './config.service';
 
 import {FuturePriceServer} from './future-price-server';
+import {Product} from "../Entities/Product";
 import {FuturePrice}        from "../Entities/FuturePrice";
 import {IFuturePrice}        from "../Entities/FuturePrice";
 
@@ -19,10 +20,10 @@ export class StaticFuturePriceServer extends FuturePriceServer {
         super(config, logger);
     }
 
-    getFuturePrices(productId: number, interval: number): Observable<FuturePrice[]>
+    getFuturePrices(product:Product): Observable<FuturePrice[]>
     {
-        this.logger.log('Getting product ' + productId + ' future prices from server...');
-        return this.http.get(this.config.dataUrl + 'GetFuturesPrice/' + productId)
+        this.logger.log('Getting product ' + product.ID + ' future prices from server...');
+        return this.http.get(this.config.dataUrl + 'GetFuturesPrice/' + product.ID)
             .map(this.extractFuturePriceData)
             .catch(this.handleError);    
     }

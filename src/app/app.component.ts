@@ -14,6 +14,7 @@ import { PollingFuturePriceServer } from './Services/polling-future-price-server
 
 import { VolServer } from './Services/vol-server';
 import { StaticVolServer } from './Services/static-vol-server.service';
+import { RandomVolServer } from './Services/random-vol-server.service';
 
 @Component({
   selector: 'my-app',
@@ -33,7 +34,7 @@ import { StaticVolServer } from './Services/static-vol-server.service';
     DataService, 
     DataStore, 
     { provide: FuturePriceServer, useClass: RandomFuturePriceServer},
-    { provide: VolServer, useClass: StaticVolServer}
+    { provide: VolServer, useClass: RandomVolServer}
     
   ]
 })

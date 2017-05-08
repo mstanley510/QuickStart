@@ -6,6 +6,7 @@ import 'rxjs/add/operator/catch';
 import {Logger} from './logger.service';
 import {Config} from './config.service';
 
+import {Product} from "../Entities/Product";
 import {FuturePrice} from "../Entities/FuturePrice";
 
 export abstract class FuturePriceServer
@@ -13,7 +14,7 @@ export abstract class FuturePriceServer
     constructor(protected config: Config, protected logger: Logger){
     }
 
-    abstract getFuturePrices(productId: number, interval: number) : Observable<FuturePrice[]>;
+    abstract getFuturePrices(product: Product) : Observable<FuturePrice[]>;
 
     protected handleError (error: Response | any) {
     // In a real world app, you might use a remote logging infrastructure

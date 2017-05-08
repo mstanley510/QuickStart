@@ -14,8 +14,8 @@ export abstract class VolServer
     constructor(protected config: Config, protected logger: Logger){
     }
 
-    abstract getVolatility(product: Product, interval: number) : Observable<Curves[]>;
-
+    abstract getVolatility(product: Product) : Observable<Curves[]>;
+    
     protected handleError (error: Response | any) {
     // In a real world app, you might use a remote logging infrastructure
     let errMsg: string;

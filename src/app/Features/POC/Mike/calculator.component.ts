@@ -1,5 +1,6 @@
 import { Component, OnInit, OnChanges, SimpleChanges } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import {ModelParameters} from '../../../PricingModels/pricing-model';
 import {PricingModel} from '../../../PricingModels/pricing-model';
 import {BlackScholes} from '../../../PricingModels/black-scholes';
 import {Bachelier} from '../../../PricingModels/bachelier';
@@ -103,9 +104,9 @@ export class CalculatorComponent implements OnInit
         let pricingModel:PricingModel;
         switch(this.selectedModel)
         {
-            case "1": pricingModel = new Bachelier(); break;
-            case "2": pricingModel = new BlackScholes(); break;
-            case "3": pricingModel = new BSAmerican2002(); break;
+            case "1": pricingModel = new Bachelier(new ModelParameters()); break;
+            case "2": pricingModel = new BlackScholes(new ModelParameters()); break;
+            case "3": pricingModel = new BSAmerican2002(new ModelParameters()); break;
         }
 
         this.call = pricingModel.Call(this.future, this.strike, this.dte, this.rate, this.vol, true);

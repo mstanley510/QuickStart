@@ -1,7 +1,7 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Subscription } from 'rxjs/subscription';
 
-import { DataService } from '../../../Services/data-service.service';
+import { DataStore } from '../../../Services/data-store.service';
 
 import { Product } from "../../../Entities/Product";
 import { Expiration } from "../../../Entities/Expiration";
@@ -14,6 +14,7 @@ import { Strike } from "../../../Entities/Strike";
     <product-picker #ppicker></product-picker>
     <expiration-picker [product]="ppicker.selectedProduct" (onChange)="onExpirationPickerChange($event)"></expiration-picker>
     <span *ngIf="strikes">Last Future Price: {{strikes[0].Expiration.Future.Prices.Last | number}}</span>
+    <span *ngIf="expiration">ATMVol: {{expiration.ATMVol | number:'1.6-6'}}</span>
     <table>
         <tr>
             <th></th>
@@ -67,13 +68,19 @@ export class GetStrikesComponent implements OnInit, OnDestroy
 {  
     private subscription: Subscription;
 
+    expiration: Expiration;
     strikes: Strike[];
     errorMessage: string;
 
-    constructor(private dataService: DataService){
+    constructor(private dataStore: DataStore){
     }
 
     ngOnInit(): void {
+    }
+
+    ngOnDestroy(): void{
+        if (this.subscription != null)
+            this.subscription.unsubscribe();
     }
 
     onExpirationPickerChange(expiration: Expiration): void {
@@ -81,16 +88,20 @@ export class GetStrikesComponent implements OnInit, OnDestroy
         if (this.subscription != null)
             this.subscription.unsubscribe();
 
+        this.expiration = expiration;
         this.loadStrikes(expiration);
     }
 
     loadStrikes(expiration:Expiration): void{
         if (expiration != null)
-            this.subscription = expiration.LiveStrikes.subscribe(strikes => this.strikes = strikes, error => this.errorMessage = <any>error);
+            //this.subscription = this.dataStore.getProduct(expiration.Product.ID).subscribe(product => this.setStrikes(product, expiration));
+            this.subscription = expiration.Strikes.subscribe(strikes => this.strikes = strikes, error => this.errorMessage = <any>error);
     }
 
-    ngOnDestroy(): void{
-        if (this.subscription != null)
-            this.subscription.unsubscribe();
+    setStrikes(product:Product, expiration:Expiration):void{
+        console.log('received new strikes....');
+        this.strikes = product._expirations.find(x => x.ID == expiration.ID)._strikes
     }
+
+
 }

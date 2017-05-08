@@ -26,6 +26,18 @@ export class Curves
 
         return c;
     }
+
+      public static fromICurves2(ic:ICurveItem):Curves{
+        
+        let c = new Curves();
+        c.ExpirationId = ic.ExpirationId;
+        c.Symbol = ic.Symbol;
+        c.Strike = ic.Curves.Strike == null ? new VolCurves() : VolCurves.fromIVolCurves(ic.Curves.Strike);
+        c.Moneyness = ic.Curves.Moneyness == null ? new VolCurves() : VolCurves.fromIVolCurves(ic.Curves.Moneyness);
+        c.Delta = ic.Curves.Delta == null ? new VolCurves() : VolCurves.fromIVolCurves(ic.Curves.Delta);
+
+        return c;
+    }
 }
 
 export class VolCurves

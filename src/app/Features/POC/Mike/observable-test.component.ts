@@ -4,13 +4,18 @@ import { Http, Response } from '@angular/http';
 import { Observable } from 'rxjs/Observable';
 import { Observer } from 'rxjs/Observer';
 import { Subscription } from 'rxjs/Subscription';
-
+import 'rxjs/add/observable/interval';
+import 'rxjs/add/observable/range';
+import 'rxjs/add/operator/publish';
+import 'rxjs/add/operator/takeWhile';
 import 'rxjs/add/operator/catch';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/count';
 
 import { DataService } from '../../../Services/data-service.service';
+import { DataStore } from '../../../Services/data-store.service';
 
+import {Product}        from "../../../Entities/Product";
 import {Future}        from "../../../Entities/Future";
 import {FuturePrice}        from "../../../Entities/FuturePrice";
 import {IFuturePrice}        from "../../../Entities/FuturePrice";
@@ -23,24 +28,41 @@ import {IFuturePrice}        from "../../../Entities/FuturePrice";
     <div><button (click)="onCountClick()">count</button>{{countOutput}}</div>
     <div><button (click)="onIntervalClick()">interval</button>{{intervalOutput}}</div>
     <div><button (click)="onConcatClick()">Concat</button>{{concatOutput}}</div>
+    <div><button (click)="onConnect1Click()">Connect1</button></div>
+    <div><button (click)="onConnect2Click()">Connect2</button></div>
     <div><button (click)="onTestClick()">Test</button><button (click)="onStopTestClick()">StopTest</button></div>
+    <div style='float:left'>
     <table>
         <tr>
-            <th>ID</th>
             <th>Open</th>
             <th>High</th>
             <th>Low</th>
             <th>Last</th>
         </tr>
-        <tr *ngFor="let f of futures">
-            <td>{{f.ID}}</td>
-            <td>{{f.Prices.Open | number:'1.4-4'}}</td>
-            <td>{{f.Prices.High | number:'1.4-4'}}</td>
-            <td>{{f.Prices.Low | number:'1.4-4'}}</td>
-            <td>{{f.Prices.Last | number:'1.4-4'}}</td>
+        <tr *ngFor="let p of prices1">
+            <td>{{p.Open | number:'1.4-4'}}</td>
+            <td>{{p.High | number:'1.4-4'}}</td>
+            <td>{{p.Low | number:'1.4-4'}}</td>
+            <td>{{p.Last | number:'1.4-4'}}</td>
         </tr>
     </table>
-
+    </div>
+    <div style='float:right'>
+    <table>
+        <tr>
+            <th>Open</th>
+            <th>High</th>
+            <th>Low</th>
+            <th>Last</th>
+        </tr>
+        <tr *ngFor="let p of prices2">
+            <td>{{p.Open | number:'1.4-4'}}</td>
+            <td>{{p.High | number:'1.4-4'}}</td>
+            <td>{{p.Low | number:'1.4-4'}}</td>
+            <td>{{p.Last | number:'1.4-4'}}</td>
+        </tr>
+    </table>
+    </div>
     `
 })
 
@@ -53,10 +75,12 @@ export class ObservableTestComponent implements OnInit, OnDestroy {
     intervalOutput: string = '';
     concatOutput:string = '';
     futures: Future[];
-
+    prices1: FuturePrice[];
+    prices2: FuturePrice[];
+    
     testSubscription: Subscription;
 
-    constructor(private http: Http, private dataService: DataService)
+    constructor(private http: Http, private dataStore: DataStore, private dataService: DataService)
     {}
 
     ngOnInit() { }
@@ -68,11 +92,32 @@ export class ObservableTestComponent implements OnInit, OnDestroy {
 
 
     onTestClick():void{
-        //this.testSubscription = this.dataService.getFutures(2, 3000).subscribe(x => this.futures = x);
     }
 
     onStopTestClick():void{
         //this.testSubscription.unsubscribe();
+    }
+
+    onConnect1Click():void{
+
+        this.dataStore.Products.subscribe((products) => {
+
+            this.dataService.getFuturePrices(products[0], 5000).subscribe(prices => {
+                console.log('new prices...');
+                this.prices1 = prices;
+            });
+        });
+    }
+
+    onConnect2Click():void{
+        this.dataStore.Products.subscribe((products) => {
+
+            this.dataService.getFuturePrices(products[0], 5000).subscribe(prices => {
+                console.log('new prices...');
+                this.prices2 = prices;
+            });
+        });
+
     }
 
     onConcatClick():void{
