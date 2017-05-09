@@ -40,6 +40,11 @@ import { Curves } from "../../../Entities/VolCurve";
             <th>Settle</th>
             <th>Last</th>
             <th>Settle</th>
+            <th>Straddle</th>
+            <th>Delta</th>
+            <th>Gamma</th>
+            <th>Vega</th>
+            <th>Theta</th>
         </tr>
         <tr *ngFor="let expiration of expirations">
             <td>{{expiration.ID}}</td>
@@ -49,10 +54,15 @@ import { Curves } from "../../../Entities/VolCurve";
             <td><qs-dteticker [date]="expiration.ExpirationDate" [interval]="3000"></qs-dteticker></td>
             <td>{{expiration.Future.Prices.Last | number}}</td>
             <td>{{expiration.Future.Prices.Settle | number}}</td>
-            <td>{{expiration.ATMVol.Last | number}}</td>
-            <td>{{expiration.ATMVol.Settle | number}}</td>
-            <td>{{expiration.ATMStrike.Last}}</td>
-            <td>{{expiration.ATMStrike.Settle}}</td>
+            <td>{{expiration.Lasts.Vol | number}}</td>
+            <td>{{expiration.Settles.Vol | number}}</td>
+            <td>{{expiration.Lasts.Strike}}</td>
+            <td>{{expiration.Settles.Strike}}</td>
+            <td>{{expiration.Lasts.Premium | number}}</td>
+            <td>{{expiration.Lasts.Delta | number}}</td>
+            <td>{{expiration.Lasts.Gamma | number}}</td>
+            <td>{{expiration.Lasts.Vega | number}}</td>
+            <td>{{expiration.Lasts.Theta | number}}</td>
         </tr>
     </table>
   `
@@ -62,9 +72,8 @@ import { Curves } from "../../../Entities/VolCurve";
 export class GetExpirationsComponent implements OnInit {
 
     private expirations: Expiration[];
-    private volcurves: Curves[];
     private errorMessage: string;
-    private eSubscription: Subscription;
+    private subscription: Subscription;
 
     constructor(private dataStore: DataStore){
     }
@@ -74,27 +83,26 @@ export class GetExpirationsComponent implements OnInit {
 
     ngOnDestroy(): void{
 
-        if (this.eSubscription != null)
-            this.eSubscription.unsubscribe();
+        if (this.subscription != null)
+            this.subscription.unsubscribe();
     }
 
     onProductPickerChange(product: Product): void{
 
-        if (this.eSubscription != null)
-            this.eSubscription.unsubscribe();
+        if (this.subscription != null)
+            this.subscription.unsubscribe();
         
         this.loadExpirations(product);
     }
 
     loadExpirations(product:Product): void{
         if (product != null)
-            //this.eSubscription = this.dataStore.getProduct(product.ID).subscribe(product => this.setExpirations(product));
-            this.eSubscription = product.Expirations.subscribe(expirations => this.expirations = expirations, error => this.errorMessage = <any>error);
+            this.subscription = product.Expirations.subscribe(expirations => this.setExpirations(expirations), error => this.errorMessage = <any>error);
     }
 
-    setExpirations(product:Product):void{
+    setExpirations(expirations:Expiration[]):void{
         console.log('received new ....');
-        this.expirations = product._expirations;
+        this.expirations = expirations;
     }
 
 

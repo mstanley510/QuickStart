@@ -58,10 +58,12 @@ export class ExpirationPickerComponent implements OnInit, OnChanges
 
     initExpirations(expirations: Expiration[]){
         this.expirations = expirations;
-        if (expirations.length > 0){
+
+        let current = this.expirations.find(x => x.ID == +this.selectedValue);
+        if (current == null && expirations.length > 0){
             this.selectedValue = expirations[0].ID.toString();
-            this.onChange.emit(this.selectedExpiration);
         }
+        this.onChange.emit(this.selectedExpiration);
     }
 
     onExpirationChange(newValue: number): void {

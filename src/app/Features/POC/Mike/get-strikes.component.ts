@@ -14,7 +14,7 @@ import { Strike } from "../../../Entities/Strike";
     <product-picker #ppicker></product-picker>
     <expiration-picker [product]="ppicker.selectedProduct" (onChange)="onExpirationPickerChange($event)"></expiration-picker>
     <span *ngIf="strikes">Last Future Price: {{strikes[0].Expiration.Future.Prices.Last | number}}</span>
-    <span *ngIf="expiration">ATMVol: {{expiration.ATMVol.Last | number:'1.6-6'}}</span>
+    <span *ngIf="expiration">ATMVol: {{expiration.Lasts.Vol | number:'1.6-6'}}</span>
     <table>
         <tr>
             <th></th>
@@ -85,6 +85,7 @@ export class GetStrikesComponent implements OnInit, OnDestroy
 
     onExpirationPickerChange(expiration: Expiration): void {
 
+        console.log('changed');
         if (this.subscription != null)
             this.subscription.unsubscribe();
 
@@ -94,14 +95,6 @@ export class GetStrikesComponent implements OnInit, OnDestroy
 
     loadStrikes(expiration:Expiration): void{
         if (expiration != null)
-            //this.subscription = this.dataStore.getProduct(expiration.Product.ID).subscribe(product => this.setStrikes(product, expiration));
             this.subscription = expiration.Strikes.subscribe(strikes => this.strikes = strikes, error => this.errorMessage = <any>error);
     }
-
-    setStrikes(product:Product, expiration:Expiration):void{
-        console.log('received new strikes....');
-        this.strikes = product._expirations.find(x => x.ID == expiration.ID)._strikes
-    }
-
-
 }

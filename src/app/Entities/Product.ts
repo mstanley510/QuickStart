@@ -79,7 +79,9 @@ export class Product
                     this.Futures,
                     this.dataService.getExpirations(this).map(expirations => this._expirations = expirations),
                     this.dataService.getVolatility(this),
-                    (futures, expirations, volatility) => { return this.mergeVolatility(expirations, volatility);}
+                    (futures, expirations, volatility) => { 
+                        expirations.forEach((x) => {x.Lasts._results = null;});
+                        return this.mergeVolatility(expirations, volatility);}
                 );
             }
 
@@ -87,7 +89,9 @@ export class Product
             return Observable.combineLatest(
                 this.Futures,
                 this.dataService.getExpirations(this).map(expirations => this._expirations = expirations),
-                (futures, expirations) => { return expirations;}
+                (futures, expirations) => { 
+                    expirations.forEach((x) => {x.Lasts._results = null;});
+                    return expirations;}
             );
         }
 
@@ -103,7 +107,12 @@ export class Product
                 this.Futures,
                 Observable.of(this._expirations),
                 this.dataService.getVolatility(this),
-                (futures, expirations, volatility) => { return this.mergeVolatility(expirations, volatility);}
+                (futures, expirations, volatility) => { 
+                    this.mergeVolatility(expirations, volatility);
+                    expirations.forEach((x) => {x.Lasts._results = null;});
+                    console.log('resetting');
+                    return expirations;
+                }
             );
 
 
@@ -118,7 +127,10 @@ export class Product
         return Observable.combineLatest(
             this.Futures,
             Observable.of(this._expirations),
-            (futures, expirations) => { return expirations;});
+            (futures, expirations) => { 
+                console.log('resetting');
+                expirations.forEach((x)=>{x.Lasts._results = null;});
+                return expirations;});
     }
 
     mergeVolatility(expirations:Expiration[], curves:Curves[]):Expiration[]{

@@ -134,8 +134,8 @@ export abstract class Option
         let results = this.Strike.Expiration.OptionCalculator.Calculate(this.OptionType, 
             this.Strike.Expiration.Future.Prices.Last, 
             this.Strike.StrikePrice, 
-            this.Strike.Expiration.DTE, 
             this.Strike.Expiration.InterestRate, 
+            this.Strike.Expiration.DTE, 
             this.Strike.Vol); 
 
         this._last = results.Premium;

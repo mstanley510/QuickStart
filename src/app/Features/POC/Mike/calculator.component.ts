@@ -109,7 +109,7 @@ export class CalculatorComponent implements OnInit
             case "3": pricingModel = new BSAmerican2002(new ModelParameters()); break;
         }
 
-        this.call = pricingModel.Call(this.future, this.strike, this.dte, this.rate, this.vol, true);
-        this.put = pricingModel.Put(this.future, this.strike, this.dte, this.rate, this.vol, true);
+        this.call = pricingModel.Call(this.future, this.strike, this.rate, this.dte, this.vol, true);
+        this.put = pricingModel.Put(this.future, this.strike, this.rate, this.dte, this.vol, true);
     }
 }

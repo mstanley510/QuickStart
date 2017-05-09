@@ -16,6 +16,7 @@ export class ModelParameters
 {
     modelType:ModelType;
     indexedProduct:boolean;
+    GBSReturn:number = 0;
 }
 
 export class Results
@@ -38,8 +39,8 @@ export abstract class PricingModel
     INCREMENT_RATE: number = 0.01;
     INCREMENT_STRIKE: number = 0.01;
 
-    public abstract Call(price:number, strike:number, days:number, rate:number, vol:number, calcGreeks:boolean):Results;
-    public abstract Put(price:number, strike:number, days:number, rate:number, vol:number, calcGreeks:boolean):Results;
+    public abstract Call(price:number, strike:number, rate:number, days:number, vol:number, calcGreeks:boolean):Results;
+    public abstract Put(price:number, strike:number, rate:number, days:number, vol:number, calcGreeks:boolean):Results;
 
     constructor(protected modelParameters:ModelParameters){
         this.modelParameters = modelParameters;
@@ -293,7 +294,7 @@ export abstract class PricingModel
         return BVN;
     }
 
-    GetDelta(optionType:OptionType, price:number, strike:number, rate:number, days:number, vol:number):number
+    protected GetDelta(optionType:OptionType, price:number, strike:number, rate:number, days:number, vol:number):number
     {
         let inc:Results;
         let dec:Results;
@@ -318,7 +319,7 @@ export abstract class PricingModel
         return (inc.Premium - dec.Premium) / (2 * dIncPrice);
     }
 
-    GetGamma(optionType:OptionType, price:number, strike:number, rate:number, days:number, vol:number):number
+    protected GetGamma(optionType:OptionType, price:number, strike:number, rate:number, days:number, vol:number):number
     {
         let inc:Results;
         let dec:Results;
@@ -345,7 +346,7 @@ export abstract class PricingModel
         return (inc.Premium + dec.Premium - center.Premium * 2) / (dIncPrice * dIncPrice);
     }
 
-    GetVega(optionType:OptionType, price:number, strike:number, rate:number, days:number, vol:number):number
+    protected GetVega(optionType:OptionType, price:number, strike:number, rate:number, days:number, vol:number):number
     {
         let inc:Results;
         let dec:Results;
@@ -368,7 +369,7 @@ export abstract class PricingModel
         return (inc.Premium - dec.Premium) / 2;   //(dIncVol * 2) / 100;
     }
 
-    GetTheta(optionType:OptionType, price:number, strike:number, rate:number, days:number, vol:number):number
+    protected GetTheta(optionType:OptionType, price:number, strike:number, rate:number, days:number, vol:number):number
     {
         let current:Results;
         let dec:Results;

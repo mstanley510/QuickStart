@@ -7,8 +7,8 @@ import {Product} from "./Product";
 import {Future} from "./Future";
 import {Strike} from "./Strike";
 import {Curves} from "./VolCurve";
-import {ATMStrike} from "./ATMStrike";
-import {ATMVol} from "./ATMVol";
+import {ATMLasts} from "./ATMLasts";
+import {ATMSettles} from "./ATMSettles";
 import {OptionCalculator} from "../PricingModels/option-calculator";
 import {ModelParameters} from "../PricingModels/pricing-model";
 
@@ -22,9 +22,9 @@ export class Expiration
     ExpirationDate : Date;
     InterestRate: number;
     UnderlyingSymbol:string;
-    ATMStrike:ATMStrike;
-    ATMVol:ATMVol;
     VolCurves:Curves;
+    Lasts:ATMLasts;
+    Settles:ATMSettles;
 
     _strikes:Strike[] = null;
     get Strikes(): Observable<Strike[]>{
@@ -43,8 +43,8 @@ export class Expiration
 
     constructor (private dataService: DataService){
         this.VolCurves = new Curves();
-        this.ATMStrike = new ATMStrike(this);
-        this.ATMVol = new ATMVol(this);
+        this.Lasts = new ATMLasts(this);
+        this.Settles = new ATMSettles(this);
     }
 
     get DTE():number{

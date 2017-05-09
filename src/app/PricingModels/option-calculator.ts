@@ -36,20 +36,20 @@ export class OptionCalculator
     constructor(private modelParameters:ModelParameters){
     }
 
-    public Calculate(optionType:OptionType, price:number, strike:number, days:number, rate:number, vol:number):Results
+    public Calculate(optionType:OptionType, price:number, strike:number, rate:number, days:number, vol:number):Results
     {
         if (!this.modelParameters.indexedProduct)
         {
             if (optionType == OptionType.Call)
-                return this.pricingModel.Call(price, strike, days, rate, vol, true);
+                return this.pricingModel.Call(price, strike, rate, days, vol, true);
 
             if (optionType == OptionType.Put)
-                return this.pricingModel.Put(price, strike, days, rate, vol, true);
+                return this.pricingModel.Put(price, strike, rate, days, vol, true);
 
             if (optionType == OptionType.Straddle)
             {
-                let callResults = this.pricingModel.Call(price, strike, days, rate, vol, true);
-                let putResults = this.pricingModel.Put(price, strike, days, rate, vol, true);
+                let callResults = this.pricingModel.Call(price, strike, rate, days, vol, true);
+                let putResults = this.pricingModel.Put(price, strike, rate, days, vol, true);
 
                 let results = new Results();
                 results.Premium = callResults.Premium + putResults.Premium;
@@ -66,22 +66,22 @@ export class OptionCalculator
         {
             if (optionType == OptionType.Call)
             {
-                let results = this.pricingModel.Put(100 - price, 100 - strike, days, rate, vol, true);
+                let results = this.pricingModel.Put(100 - price, 100 - strike, rate, days, vol, true);
                 results.Delta = -results.Delta;
                 return results;
             }
 
             if (optionType == OptionType.Put)
             {
-                let results = this.pricingModel.Call(100 - price, 100 - strike, days, rate, vol, true);
+                let results = this.pricingModel.Call(100 - price, 100 - strike, rate, days, vol, true);
                 results.Delta = -results.Delta;
                 return results;
             }
 
             if (optionType == OptionType.Straddle)
             {
-                let callResults = this.pricingModel.Call(100 - price, 100 - strike, days, rate, vol, true);
-                let putResults = this.pricingModel.Put(100 - price, 100 - strike, days, rate, vol, true);
+                let callResults = this.pricingModel.Call(100 - price, 100 - strike, rate, days, vol, true);
+                let putResults = this.pricingModel.Put(100 - price, 100 - strike, rate, days, vol, true);
 
                 let results = new Results();
                 results.Premium = callResults.Premium + putResults.Premium;

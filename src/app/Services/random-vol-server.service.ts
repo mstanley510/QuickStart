@@ -42,6 +42,7 @@ export class RandomVolServer extends StaticVolServer {
             super.getVolatility(product),
             Observable.interval(product.volRefreshInterval).startWith(0),
             function(s1, s2){
+                console.log('Generating random volatility...');
                 s1.forEach((x:Curves) => {
                     if (x.Moneyness.Current != null)
                     {

@@ -1,14 +1,20 @@
 import {PricingModel} from './pricing-model';
+import {ModelParameters} from './pricing-model';
+import {GBlackScholes} from './gblack-scholes';
 import {Results} from './pricing-model';
 import {OptionType} from './pricing-model';
 
 export class BSAmerican2002 extends PricingModel
 {
-    Call(price:number, strike:number, days:number, rate:number, vol:number, calcGreeks:boolean): Results {
+    constructor(modelParameters:ModelParameters){
+        super(modelParameters);
+    }
+
+    Call(price:number, strike:number, rate:number, days:number, vol:number, calcGreeks:boolean): Results {
 
         if (calcGreeks == undefined) calcGreeks = true;
 
-        let dPremium;
+        let dPremium:number;
         let S = price;
         let X = strike;
         let T = days / 365; // days convert to years
@@ -31,9 +37,8 @@ export class BSAmerican2002 extends PricingModel
     
         if (b >= r)  // Never optimal to exersice before maturity
         {
-            throw 'Unexepected value for interest rate r - should always be zero or positive'
-            //GBlackScholes gbs = new GBlackScholes(this.ModelParameters);
-            //dPremium = gbs.Call(dPrice, dStrike, dRate, dDays, dVol, adGreeks);
+            let gbs = new GBlackScholes(this.modelParameters);
+            dPremium = gbs.Call(price, strike, rate, days, vol, false).Premium;
         }
         else
         {       
@@ -79,7 +84,7 @@ export class BSAmerican2002 extends PricingModel
         return results;
     }
 
-    Put(price:number, strike:number, days:number, rate:number, vol:number, calcGreeks:boolean): Results {
+    Put(price:number, strike:number, rate:number, days:number, vol:number, calcGreeks:boolean): Results {
         
         if (calcGreeks == undefined) calcGreeks = true;
 

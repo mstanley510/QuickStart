@@ -14,7 +14,7 @@ class Factors
 
 export class BlackScholes extends PricingModel
 {
-     Call(price:number, strike:number, days:number, rate:number, vol:number, calcGreeks:boolean): Results {
+     Call(price:number, strike:number, rate:number, days:number, vol:number, calcGreeks:boolean): Results {
         
         if (calcGreeks == undefined) calcGreeks = true;
 
@@ -34,7 +34,7 @@ export class BlackScholes extends PricingModel
         return results;
     }
 
-    Put(price:number, strike:number, days:number, rate:number, vol:number, calcGreeks:boolean): Results {
+    Put(price:number, strike:number, rate:number, days:number, vol:number, calcGreeks:boolean): Results {
 
         if (calcGreeks == undefined) calcGreeks = true;
 
