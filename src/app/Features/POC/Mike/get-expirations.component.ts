@@ -23,24 +23,36 @@ import { Curves } from "../../../Entities/VolCurve";
 
     <table>
         <tr>
+            <th colspan='5'></th>
+            <th colspan='2'>Future</th>
+            <th colspan='2'>ATM Vol</th>
+            <th colspan='2'>ATM Strike</th>
+        </tr>
+        <tr>
             <th>ID</th>
             <th>Symbol</th>
             <th>Description</th>
-            <th>ExpirationDate</th>
+            <th>Expires</th>
             <th>DTE</th>
-            <th>InterestRate</th>
-            <th>Future</th>
-            <th>ATMVol</th>
+            <th>Last</th>
+            <th>Settle</th>
+            <th>Last</th>
+            <th>Settle</th>
+            <th>Last</th>
+            <th>Settle</th>
         </tr>
         <tr *ngFor="let expiration of expirations">
             <td>{{expiration.ID}}</td>
             <td>{{expiration.Symbol}}</td>
             <td>{{expiration.Description}}</td>
-            <td>{{expiration.ExpirationDate | date:'short'}}</td>
+            <td>{{expiration.ExpirationDate | date:'shortDate'}}</td>
             <td><qs-dteticker [date]="expiration.ExpirationDate" [interval]="3000"></qs-dteticker></td>
-            <td>{{expiration.InterestRate}}</td>
             <td>{{expiration.Future.Prices.Last | number}}</td>
-            <td>{{expiration.ATMVol | number}}</td>
+            <td>{{expiration.Future.Prices.Settle | number}}</td>
+            <td>{{expiration.ATMVol.Last | number}}</td>
+            <td>{{expiration.ATMVol.Settle | number}}</td>
+            <td>{{expiration.ATMStrike.Last}}</td>
+            <td>{{expiration.ATMStrike.Settle}}</td>
         </tr>
     </table>
   `

@@ -49,8 +49,8 @@ export class VolCurves
     public static fromIVolCurves(ivc:IVolCurves): VolCurves{
 
         let vc = new VolCurves();
-        vc.Settle = VolCurve.fromIVolCurve(ivc.Settle);
-        vc.Current = VolCurve.fromIVolCurve(ivc.Current);
+        vc.Settle = ivc.Settle == null ? null : VolCurve.fromIVolCurve(ivc.Settle);
+        vc.Current = ivc.Current == null ? null : VolCurve.fromIVolCurve(ivc.Current);
         return vc;
     }
 }

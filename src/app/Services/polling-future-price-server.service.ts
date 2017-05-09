@@ -12,6 +12,7 @@ import {Logger} from './logger.service';
 import {Config} from './config.service';
 
 import {FuturePriceServer} from './future-price-server';
+import {Product}        from "../Entities/Product";
 import {FuturePrice}        from "../Entities/FuturePrice";
 import {IFuturePrice}        from "../Entities/FuturePrice";
 
@@ -23,17 +24,17 @@ export class PollingFuturePriceServer extends FuturePriceServer {
         super(config, logger);
     }
 
-    getFuturePrices(productId: number, interval: number) : Observable<FuturePrice[]>{
+    getFuturePrices(product: Product) : Observable<FuturePrice[]>{
 
-        let url = this.config.dataUrl + 'GetFuturesPrice/' + productId;
+        let url = this.config.dataUrl + 'GetFuturesPrice/' + product.ID;
         
         let observable1 = this.http.get(url);
-        let observable2 = Observable.interval(interval).flatMap(x => this.http.get(url));
+        let observable2 = Observable.interval(product.futureRefreshInterval).flatMap(x => this.http.get(url));
         let observable3 = Observable.merge(observable1, observable2).map(res => {
             let data = res.json() || [];
             let prices = new Array<FuturePrice>();
             data.forEach((ifp: IFuturePrice) => { prices.push(FuturePrice.fromIFP(ifp)); })
-            this.logger.log('Got future prices for ' + productId + ' from server ....');
+            this.logger.log('Got future prices for ' + product.ID + ' from server ....');
             return prices;
         });
 

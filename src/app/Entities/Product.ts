@@ -2,7 +2,7 @@ import { Observable } from 'rxjs/Observable';
 import { Observer } from 'rxjs/Observer';
 import 'rxjs/add/operator/concat';
 import 'rxjs/add/operator/filter';
-import 'rxjs/add/operator/withLatestFrom';
+import 'rxjs/add/operator/do';
 
 import { DataService } from '../Services/data-service.service';
 
@@ -21,6 +21,7 @@ export class Product
     LastSettlementDate: Date;
     ModelType:ModelType;
     IsIndexed:boolean;
+    DefaultStrikeInterval:number;
 
     useLiveFutures = true;
     useLiveVolatility = true;
@@ -37,20 +38,20 @@ export class Product
                 console.log('Calling server for product ' + this.ID + ' LIVE futures...')
                 return Observable.combineLatest(
                     this.dataService.getFutures(this).map(futures => this._futures = futures), 
-                    this.dataService.getFuturePrices(this, this.futureRefreshInterval),
-                    this.mergeFuturePrices);
-            }
+                    this.dataService.getFuturePrices(this),
+                    this.mergeFuturePrices)
+            };
 
-            console.log('Getting product ' + this.ID + ' STATIC futures from cache...');
+            console.log('Calling server for product ' + this.ID + ' STATIC futures ...');
             return this.dataService.getFutures(this).map(futures => this._futures = futures);
         }
 
         if (this.useLiveFutures)
         {
-            console.log('Calling server for product ' + this.ID + ' LIVE futures ....');
+            console.log('Getting product ' + this.ID + ' LIVE futures from cache....');
             return Observable.combineLatest(
                 Observable.of(this._futures), 
-                this.dataService.getFuturePrices(this, this.futureRefreshInterval),
+                this.dataService.getFuturePrices(this),
                 this.mergeFuturePrices);
         }
 
@@ -59,7 +60,7 @@ export class Product
     }
 
     mergeFuturePrices(futures:Future[], prices:FuturePrice[]):Future[]{
-        console.log('Merging future prices...');
+        //console.log('Merging future prices...');
         futures.forEach((f: Future) => {
             f.Prices = prices.find(x => x.Symbol == f.Symbol)
         });
@@ -96,7 +97,7 @@ export class Product
             //It is due to the fact that a FuturePrice update causes a new sequence element to emit but I can't
             //tell the difference between a FuturePrice update and a volatility update so I have to run the mergeVolatility
             //routine all the time......not smart enough to figure out a way around it. NOTE: tried the .withLatestFrom below but had no effect.
-            
+
             console.log('Getting product ' + this.ID + ' LIVE expirations from cache...');
             return Observable.combineLatest(
                 this.Futures,
@@ -121,7 +122,7 @@ export class Product
     }
 
     mergeVolatility(expirations:Expiration[], curves:Curves[]):Expiration[]{
-        console.log('Merging volatility...');
+        //console.log('Merging volatility...');
         expirations.forEach((e: Expiration) => {
             e.VolCurves = curves.find(x => x.ExpirationId == e.ID)});
 
@@ -140,6 +141,7 @@ export class Product
         p.LastSettlementDate = new Date(parseInt(ip.LastSettlementDate.substr(6)));
         p.ModelType = ip.Model as ModelType;
         p.IsIndexed = ip.YieldVol;
+        p.DefaultStrikeInterval = ip.DefaultStrikeInterval;
         return p;
     }
 }
@@ -153,6 +155,7 @@ export interface IProduct
     LastSettlementDate: string; 
     Model:number;
     YieldVol:boolean;
+    DefaultStrikeInterval:number;
 }
 
 

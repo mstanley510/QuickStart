@@ -63,12 +63,11 @@ export class GetFuturesComponent implements OnInit, OnDestroy {
     loadFutures(product:Product): void{
         if (product != null)
             //this.subscription = this.dataStore.getProduct(product.ID).subscribe(x => this.setFutures(x), error => this.errorMessage = <any>error);
-            this.subscription = product.Futures.subscribe(futures => this.futures = futures, error => this.errorMessage = <any>error);
+            this.subscription = product.Futures.subscribe(futures => this.setFutures(futures), error => this.errorMessage = <any>error);
     }
 
-    setFutures(product:Product):void{
-        console.log('received new ....');
-        this.futures = product._futures;
+    setFutures(futures:Future[]):void{
+        this.futures = futures;
     }
 
     ngOnDestroy(): void{

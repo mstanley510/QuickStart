@@ -14,7 +14,7 @@ import { Strike } from "../../../Entities/Strike";
     <product-picker #ppicker></product-picker>
     <expiration-picker [product]="ppicker.selectedProduct" (onChange)="onExpirationPickerChange($event)"></expiration-picker>
     <span *ngIf="strikes">Last Future Price: {{strikes[0].Expiration.Future.Prices.Last | number}}</span>
-    <span *ngIf="expiration">ATMVol: {{expiration.ATMVol | number:'1.6-6'}}</span>
+    <span *ngIf="expiration">ATMVol: {{expiration.ATMVol.Last | number:'1.6-6'}}</span>
     <table>
         <tr>
             <th></th>

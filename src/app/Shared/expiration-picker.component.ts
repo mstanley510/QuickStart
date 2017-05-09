@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, OnInit, OnChanges } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnInit, OnDestroy, OnChanges } from '@angular/core';
 import { Subscription } from 'rxjs/subscription';
 
 import { Product } from "../Entities/Product";
@@ -40,6 +40,11 @@ export class ExpirationPickerComponent implements OnInit, OnChanges
     }
 
     public ngOnInit(): void{
+    }
+
+    public ngOnDestroy():void{
+        if (this.subscription != null)
+            this.subscription.unsubscribe();
     }
 
     public ngOnChanges(): void{

@@ -1,7 +1,8 @@
 import { Injectable }   from '@angular/core';
 import { Http, Response } from '@angular/http';
 
-import { Observable } from 'rxjs/observable';
+import { Observable } from 'rxjs/Observable';
+import 'rxjs/add/observable/throw';
 import 'rxjs/add/operator/catch';
 import 'rxjs/add/operator/take';
 import 'rxjs/add/operator/merge';
@@ -12,6 +13,7 @@ import {Config} from './config.service';
 
 import {FuturePriceServer} from './future-price-server';
 import {VolServer} from './vol-server';
+
 import {Product} from "../Entities/Product";
 import {IProduct} from "../Entities/Product";
 import {Future} from "../Entities/Future";
@@ -69,7 +71,7 @@ export class DataService {
         return futures;
     }
 
-    getFuturePrices(product: Product, interval: number): Observable<FuturePrice[]>
+    getFuturePrices(product: Product): Observable<FuturePrice[]>
     {
         return this.futurePriceServer.getFuturePrices(product);
     }
@@ -136,27 +138,16 @@ export class DataService {
     // }
 
 
-
-
-
-
-
-
-
-
-
-
-
     private handleError (error: Response | any) {
         // In a real world app, you might use a remote logging infrastructure
         let errMsg: string;
         if (error instanceof Response) {
-        const body = error.json() || '';
-        const err = body.error || JSON.stringify(body);
-        errMsg = `${error.status} - ${error.statusText || ''} ${err}`;
+            const body = error.json() || '';
+            const err = body.error || JSON.stringify(body);
+            errMsg = `${error.status} - ${error.statusText || ''} ${err}`;
         } 
         else {
-        errMsg = error.message ? error.message : error.toString();
+            errMsg = error.message ? error.message : error.toString();
         }
         console.error(errMsg);
         return Observable.throw(errMsg);

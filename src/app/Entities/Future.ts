@@ -24,6 +24,10 @@ export class Future
 
         f.Prices = new FuturePrice();
         f.Prices.Last = ifu.FuturePrice;
+        f.Prices.Open = ifu.Settle;
+        f.Prices.High = ifu.Settle;
+        f.Prices.Low = ifu.Settle;
+        f.Prices.Settle = ifu.Settle;
         return f;
     }
 }
@@ -36,4 +40,5 @@ export interface IFuture
     Description: string;
     ExpirationDate: string;
     FuturePrice: number;
+    Settle: number;
 }

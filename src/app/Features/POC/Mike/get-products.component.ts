@@ -42,7 +42,7 @@ export class GetProductsComponent implements OnInit, OnDestroy
     get orderedProducts(): Product[] 
     {
         if (this._orderedProducts == null)
-            this._orderedProducts = this.orderByField(this.products, 'ID');
+            this._orderedProducts = this.orderByField<Product>(this.products, 'ID');
 
         return this._orderedProducts;
     }
@@ -51,7 +51,7 @@ export class GetProductsComponent implements OnInit, OnDestroy
     }
 
     ngOnInit(): void {
-        this.subscription = this.dataStore.Products.subscribe(products => this.products = products, error => this.errorMessage = <any>error);
+        this.subscription = this.dataStore.Products.subscribe(products => this.products = products, error => {throw new Error(error);}, () => console.log("Loading products complete"));
     }
 
     ngOnDestroy(): void{
@@ -60,17 +60,17 @@ export class GetProductsComponent implements OnInit, OnDestroy
     }
 
     //Ordering could be done in a pipe or by a service....see pipe documentation for concerns about pipes. Service is probably the way to go...
-    private orderByField(products: Product[], field: string): Product[]
+    private orderByField<T>(items: T[], field: string): T[]
     {
-        if (products == null)
+        if (items == null)
           return null;
 
-        products.sort((a: any, b: any) => {
+        items.sort((a: any, b: any) => {
             if ( a[field] < b[field] ){ return -1; }
             else if( a[field] > b[field] ){ return 1; }
             else {return 0;}
         });
 
-      return products;
+      return items;
     }
 }

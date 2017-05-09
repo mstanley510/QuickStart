@@ -26,7 +26,7 @@ export class DataStore {
         }
 
         this.logger.log("Getting products from cache....");
-        return new Observable<Product[]>((observer: Observer<Product[]>) => {observer.next(this._products)});
+        return new Observable<Product[]>((observer: Observer<Product[]>) => {observer.next(this._products);observer.complete();});
         
     }
 

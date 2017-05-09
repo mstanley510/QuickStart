@@ -7,6 +7,8 @@ import {Product} from "./Product";
 import {Future} from "./Future";
 import {Strike} from "./Strike";
 import {Curves} from "./VolCurve";
+import {ATMStrike} from "./ATMStrike";
+import {ATMVol} from "./ATMVol";
 import {OptionCalculator} from "../PricingModels/option-calculator";
 import {ModelParameters} from "../PricingModels/pricing-model";
 
@@ -20,7 +22,8 @@ export class Expiration
     ExpirationDate : Date;
     InterestRate: number;
     UnderlyingSymbol:string;
-
+    ATMStrike:ATMStrike;
+    ATMVol:ATMVol;
     VolCurves:Curves;
 
     _strikes:Strike[] = null;
@@ -36,44 +39,17 @@ export class Expiration
             });
             return strikes;
         });
-        // if (this._strikes == null)
-        //     return Observable.combineLatest(
-        //         this.dataService.getStrikes(this).map(strikes => this._strikes = strikes),
-        //         this.Product.Futures,
-        //         (v1, v2) => {return v1;});
-
-        // return Observable.combineLatest(
-        //     Observable.of(this._strikes),
-        //     this.Product.Futures,
-        //     (v1, v2) => {return v1;});
     }
 
     constructor (private dataService: DataService){
         this.VolCurves = new Curves();
+        this.ATMStrike = new ATMStrike(this);
+        this.ATMVol = new ATMVol(this);
     }
 
     get DTE():number{
         return (this.ExpirationDate.getTime() - new Date().getTime()) / 86400000;
     }
-
-    get ATMVol():number{
-        return this.VolCurves.Moneyness.Current == null ? 0 : this.VolCurves.Moneyness.Current.F(0);
-    }
-
-    get ATMSettle():Strike{
-        let strike = this._strikes.find(x => x.IsSettleATM);
-
-        if (strike == null)
-            return this._strikes[0];
-
-        return strike;
-    }
-
-    // get ATMStrike():Strike{
-
-    //     let min = Math.min.apply(Math, this._liveStrikes.map(function(o){return o.SMinusX;}))
-    //     return this._liveStrikes.find(function(o){ return o.SMinusX == min; })
-    // }
 
     private _modelParameters:ModelParameters = null;
     get ModelParameters():ModelParameters{

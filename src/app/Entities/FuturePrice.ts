@@ -7,6 +7,7 @@ export class FuturePrice
     public High : number;
     public Low : number;
     public Last : number;
+    public Settle: number;
 
     public static fromIFP(ifp: IFuturePrice): FuturePrice {
 
@@ -17,7 +18,7 @@ export class FuturePrice
         fp.High = ifp.High;
         fp.Low = ifp.Low;
         fp.Last = ifp.Last;
-
+        fp.Settle = ifp.Settle;
         return fp;
     }
 }
@@ -31,4 +32,5 @@ export interface IFuturePrice
     High: number;
     Low: number;
     Last: number;
+    Settle: number;
 }

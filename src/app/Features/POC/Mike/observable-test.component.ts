@@ -4,6 +4,7 @@ import { Http, Response } from '@angular/http';
 import { Observable } from 'rxjs/Observable';
 import { Observer } from 'rxjs/Observer';
 import { Subscription } from 'rxjs/Subscription';
+import { Subject } from 'rxjs/Subject';
 import 'rxjs/add/observable/interval';
 import 'rxjs/add/observable/range';
 import 'rxjs/add/operator/publish';
@@ -28,41 +29,79 @@ import {IFuturePrice}        from "../../../Entities/FuturePrice";
     <div><button (click)="onCountClick()">count</button>{{countOutput}}</div>
     <div><button (click)="onIntervalClick()">interval</button>{{intervalOutput}}</div>
     <div><button (click)="onConcatClick()">Concat</button>{{concatOutput}}</div>
-    <div><button (click)="onConnect1Click()">Connect1</button></div>
-    <div><button (click)="onConnect2Click()">Connect2</button></div>
+    <div><button (click)="onConnect1Click()">Connect1</button><button (click)="onDisconnect1Click()">Disconnect1</button></div>
+    <div><button (click)="onConnect2Click()">Connect2</button><button (click)="onDisconnect2Click()">Disconnect2</button></div>
+    <div><button (click)="onConnect3Click()">Connect3</button><button (click)="onDisconnect3Click()">Disconnect3</button></div>
+    <div><button (click)="onConnect4Click()">Connect4</button><button (click)="onDisconnect4Click()">Disconnect4</button></div>
     <div><button (click)="onTestClick()">Test</button><button (click)="onStopTestClick()">StopTest</button></div>
+    <div><h2>Product1</h2></div>
     <div style='float:left'>
-    <table>
-        <tr>
-            <th>Open</th>
-            <th>High</th>
-            <th>Low</th>
-            <th>Last</th>
-        </tr>
-        <tr *ngFor="let p of prices1">
-            <td>{{p.Open | number:'1.4-4'}}</td>
-            <td>{{p.High | number:'1.4-4'}}</td>
-            <td>{{p.Low | number:'1.4-4'}}</td>
-            <td>{{p.Last | number:'1.4-4'}}</td>
-        </tr>
-    </table>
+        <table *ngIf="prices1">
+            <tr>
+                <th>Open</th>
+                <th>High</th>
+                <th>Low</th>
+                <th>Last</th>
+            </tr>
+            <tr>
+                <td>{{prices1[0].Open | number:'1.4-4'}}</td>
+                <td>{{prices1[0].High | number:'1.4-4'}}</td>
+                <td>{{prices1[0].Low | number:'1.4-4'}}</td>
+                <td>{{prices1[0].Last | number:'1.4-4'}}</td>
+            </tr>
+        </table>
+        </div>
+        <div style='float:right'>
+        <table *ngIf="prices2">
+            <tr>
+                <th>Open</th>
+                <th>High</th>
+                <th>Low</th>
+                <th>Last</th>
+            </tr>
+            <tr>
+                <td>{{prices2[0].Open | number:'1.4-4'}}</td>
+                <td>{{prices2[0].High | number:'1.4-4'}}</td>
+                <td>{{prices2[0].Low | number:'1.4-4'}}</td>
+                <td>{{prices2[0].Last | number:'1.4-4'}}</td>
+            </tr>
+        </table>
     </div>
-    <div style='float:right'>
-    <table>
-        <tr>
-            <th>Open</th>
-            <th>High</th>
-            <th>Low</th>
-            <th>Last</th>
-        </tr>
-        <tr *ngFor="let p of prices2">
-            <td>{{p.Open | number:'1.4-4'}}</td>
-            <td>{{p.High | number:'1.4-4'}}</td>
-            <td>{{p.Low | number:'1.4-4'}}</td>
-            <td>{{p.Last | number:'1.4-4'}}</td>
-        </tr>
-    </table>
+    <div style='clear:both'></div>
+    <div><h2>Product2</h2></div>
+    <div style='float:left'>
+        <table *ngIf="prices3">
+            <tr>
+                <th>Open</th>
+                <th>High</th>
+                <th>Low</th>
+                <th>Last</th>
+            </tr>
+            <tr>
+                <td>{{prices3[0].Open | number:'1.4-4'}}</td>
+                <td>{{prices3[0].High | number:'1.4-4'}}</td>
+                <td>{{prices3[0].Low | number:'1.4-4'}}</td>
+                <td>{{prices3[0].Last | number:'1.4-4'}}</td>
+            </tr>
+        </table>
+        </div>
+        <div style='float:right'>
+        <table *ngIf="prices4">
+            <tr>
+                <th>Open</th>
+                <th>High</th>
+                <th>Low</th>
+                <th>Last</th>
+            </tr>
+            <tr>
+                <td>{{prices4[0].Open | number:'1.4-4'}}</td>
+                <td>{{prices4[0].High | number:'1.4-4'}}</td>
+                <td>{{prices4[0].Low | number:'1.4-4'}}</td>
+                <td>{{prices4[0].Last | number:'1.4-4'}}</td>
+            </tr>
+        </table>
     </div>
+    <div style='clear:both'></div>
     `
 })
 
@@ -75,10 +114,17 @@ export class ObservableTestComponent implements OnInit, OnDestroy {
     intervalOutput: string = '';
     concatOutput:string = '';
     futures: Future[];
+
     prices1: FuturePrice[];
     prices2: FuturePrice[];
-    
+    prices3: FuturePrice[];
+    prices4: FuturePrice[];
+
     testSubscription: Subscription;
+    connect1Subscription: Subscription;
+    connect2Subscription: Subscription;
+    connect3Subscription: Subscription;
+    connect4Subscription: Subscription;
 
     constructor(private http: Http, private dataStore: DataStore, private dataService: DataService)
     {}
@@ -102,9 +148,8 @@ export class ObservableTestComponent implements OnInit, OnDestroy {
 
         this.dataStore.Products.subscribe((products) => {
 
-            this.dataService.getFuturePrices(products[0], 5000).subscribe(prices => {
-                console.log('new prices...');
-                this.prices1 = prices;
+            this.connect1Subscription = this.dataService.getFuturePrices(products[0]).subscribe(prices => {
+                    this.prices1 = prices;
             });
         });
     }
@@ -112,12 +157,57 @@ export class ObservableTestComponent implements OnInit, OnDestroy {
     onConnect2Click():void{
         this.dataStore.Products.subscribe((products) => {
 
-            this.dataService.getFuturePrices(products[0], 5000).subscribe(prices => {
-                console.log('new prices...');
-                this.prices2 = prices;
+            this.connect2Subscription = this.dataService.getFuturePrices(products[0]).subscribe(prices => {
+                    this.prices2 = prices;
             });
         });
 
+    }
+
+    onConnect3Click():void{
+        this.dataStore.Products.subscribe((products) => {
+
+            this.connect3Subscription = this.dataService.getFuturePrices(products[1]).subscribe(prices => {
+                    this.prices3 = prices;
+            });
+        });
+
+    }
+
+    onConnect4Click():void{
+        this.dataStore.Products.subscribe((products) => {
+
+            this.connect4Subscription = this.dataService.getFuturePrices(products[1]).subscribe(prices => {
+                    this.prices4 = prices;
+            });
+        });
+
+    }
+
+
+
+    onDisconnect1Click():void{
+        console.log('unsubscribe1...');
+        if (this.connect1Subscription != null)
+            this.connect1Subscription.unsubscribe();
+    }
+
+    onDisconnect2Click():void{
+        console.log('unsubscribe2...');
+        if (this.connect2Subscription != null)
+            this.connect2Subscription.unsubscribe();
+    }
+
+    onDisconnect3Click():void{
+        console.log('unsubscribe3...');
+        if (this.connect3Subscription != null)
+            this.connect3Subscription.unsubscribe();
+    }
+
+    onDisconnect4Click():void{
+        console.log('unsubscribe4...');
+        if (this.connect4Subscription != null)
+            this.connect4Subscription.unsubscribe();
     }
 
     onConcatClick():void{
