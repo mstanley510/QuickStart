@@ -9,16 +9,18 @@ import { Product } from "../../../Entities/Product";
   template: `
     <h1>GetProducts</h1>
     <div>{{errorMessage}}</div>
-    <table>
-      <tr>
-        <th>ID</th>
-        <th>Abbr</th>
-        <th>Name</th>
-        <th>Description</th>
-        <th>LastSettle</th>
-        <th>Model</th>
-        <th>IsIndexed</th>
-      </tr>
+    <table class="table">
+      <thead class="thead-default">
+        <tr>
+          <th>ID</th>
+          <th>Abbr</th>
+          <th>Name</th>
+          <th>Description</th>
+          <th>LastSettle</th>
+          <th>Model</th>
+          <th>IsIndexed</th>
+        </tr>
+      </thead>
       <tr *ngFor="let product of orderedProducts">
         <td>{{product.ID}}</td>
         <td>{{product.Abbreviation}}</td>

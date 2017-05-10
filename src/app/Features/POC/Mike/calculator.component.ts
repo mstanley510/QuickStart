@@ -9,71 +9,85 @@ import {Results} from '../../../PricingModels/pricing-model';
 
 @Component({
   template: `
-    <h1>Calculator</h1>
-    <div>
-        <label>Model:</label><br/>
-        <select [(ngModel)]="selectedModel" (ngModelChange)="calculate()">
-            <option value="1">Bachelier</option>
-            <option value="2">Black &amp; Scholes</option>
-            <option value="3">B&amp;S American 2002</option>
-        </select>
-    </div>
-    <div>
-        <label>Future:</label><br/>
-        <number-ticker [(value)]='future' [step]='1' [format]="futureFormat" (valueChange)="calculate()"></number-ticker>
-    </div>
-    <div>
-        <label>Strike:</label><br/>
-        <number-ticker [(value)]='strike' [step]='1' [format]="strikeFormat" (valueChange)="calculate()"></number-ticker>
-    </div>
-    <div>
-        <label>Vol:</label><br/>
-        <number-ticker [(value)]='vol' [step]='0.01' [format]="volFormat" (valueChange)="calculate()"></number-ticker>
-    </div>
-    <div>
-        <label>Rate:</label><br/>
-        <number-ticker [(value)]='rate' [step]='0.001' [format]="rateFormat" (valueChange)="calculate()"></number-ticker>
-    </div>
-    <div>
-        <label>DTE:</label><br/>
-        <number-ticker [(value)]='dte' [step]='1' [format]="dteFormat" (valueChange)="calculate()"></number-ticker>
+    <h1>Option Calculator</h1>
+    <div class='container'>
+        <div class='row'>
+            <div class='col'>
+
+                <div class='form-group'>
+                    <label for='model'>Model:</label>
+                    <select id='model' class='form-control' [(ngModel)]="selectedModel" (ngModelChange)="calculate()">
+                        <option value="1">Bachelier</option>
+                        <option value="2">Black &amp; Scholes</option>
+                        <option value="3">B&amp;S American 2002</option>
+                    </select>
+                </div>
+                <div class='form-group'>
+                    <label for='future'>Future:</label>
+                    <number-ticker id='future' class='form-control' [(value)]='future' [step]='1' [format]="futureFormat" (valueChange)="calculate()"></number-ticker>
+                </div>
+                <div class='form-group'>
+                    <label>Strike:</label>
+                    <number-ticker class='form-control' [(value)]='strike' [step]='1' [format]="strikeFormat" (valueChange)="calculate()"></number-ticker>
+                </div>
+                <div class='form-group'>
+                    <label>Vol:</label>
+                    <number-ticker class='form-control' [(value)]='vol' [step]='0.01' [format]="volFormat" (valueChange)="calculate()"></number-ticker>
+                </div>
+                <div class='form-group'>
+                    <label>Rate:</label>
+                    <number-ticker class='form-control' [(value)]='rate' [step]='0.001' [format]="rateFormat" (valueChange)="calculate()"></number-ticker>
+                </div>
+                <div class='form-group'>
+                    <label>DTE:</label>
+                    <number-ticker class='form-control' [(value)]='dte' [step]='1' [format]="dteFormat" (valueChange)="calculate()"></number-ticker>
+                </div>
+
+
+            </div>
+            <div class='col'>
+
+                <table class='table'>
+                    <tr>
+                        <th colspan='2'>Call</th>
+                        <th colspan='2'>Put</th>
+                    <tr>
+                        <td>Price:</td>
+                        <td>{{call.Premium | number:'1.4-4'}}</td>
+                        <td>Price:</td>
+                        <td>{{put.Premium | number:'1.4-4'}}</td>
+                    </tr>
+                    <tr>
+                        <td>Delta:</td>
+                        <td>{{call.Delta | number:'1.4-4'}}</td>
+                        <td>Delta:</td>
+                        <td>{{put.Delta | number:'1.4-4'}}</td>
+                    </tr>
+                    <tr>
+                        <td>Gamma:</td>
+                        <td>{{call.Gamma | number:'1.4-4'}}</td>
+                        <td>Gamma:</td>
+                        <td>{{put.Gamma | number:'1.4-4'}}</td>
+                    </tr>
+                    <tr>
+                        <td>Vega:</td>
+                        <td>{{call.Vega | number:'1.4-4'}}</td>
+                        <td>Vega:</td>
+                        <td>{{put.Vega | number:'1.4-4'}}</td>
+                    </tr>
+                    <tr>
+                        <td>Theta:</td>
+                        <td>{{call.Theta | number:'1.4-4'}}</td>
+                        <td>Theta:</td>
+                        <td>{{put.Theta | number:'1.4-4'}}</td>
+                    </tr>
+                </table>
+
+            </div>
+        </div>
     </div>
 
-    <table>
-        <tr>
-            <th colspan='2'>Call</th>
-            <th colspan='2'>Put</th>
-        <tr>
-            <td>Price:</td>
-            <td>{{call.Premium | number:'1.4-4'}}</td>
-            <td>Price:</td>
-            <td>{{put.Premium | number:'1.4-4'}}</td>
-        </tr>
-        <tr>
-            <td>Delta:</td>
-            <td>{{call.Delta | number:'1.4-4'}}</td>
-            <td>Delta:</td>
-            <td>{{put.Delta | number:'1.4-4'}}</td>
-        </tr>
-        <tr>
-            <td>Gamma:</td>
-            <td>{{call.Gamma | number:'1.4-4'}}</td>
-            <td>Gamma:</td>
-            <td>{{put.Gamma | number:'1.4-4'}}</td>
-        </tr>
-        <tr>
-            <td>Vega:</td>
-            <td>{{call.Vega | number:'1.4-4'}}</td>
-            <td>Vega:</td>
-            <td>{{put.Vega | number:'1.4-4'}}</td>
-        </tr>
-        <tr>
-            <td>Theta:</td>
-            <td>{{call.Theta | number:'1.4-4'}}</td>
-            <td>Theta:</td>
-            <td>{{put.Theta | number:'1.4-4'}}</td>
-        </tr>
-    </table>
+
   `
 })
 

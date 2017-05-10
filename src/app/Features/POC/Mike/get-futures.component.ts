@@ -14,18 +14,20 @@ import { FuturePrice } from "../../../Entities/FuturePrice";
     {{errorMessage}}
     <product-picker (onChange)="onProductPickerChange($event)"></product-picker>
     
-    <table>
-        <tr>
-            <th>ID</th>
-            <th>Symbol</th>
-            <th>Description</th>
-            <th>ExpirationDate</th>
-            <th>DTE</th>
-            <th>Open</th>
-            <th>High</th>
-            <th>Low</th>
-            <th>Last</th>
-        </tr>
+    <table class='table table-sm table-hover'>
+        <thead class='thead-default'>
+            <tr>
+                <th>ID</th>
+                <th>Symbol</th>
+                <th>Description</th>
+                <th>ExpirationDate</th>
+                <th>DTE</th>
+                <th>Open</th>
+                <th>High</th>
+                <th>Low</th>
+                <th>Last</th>
+            </tr>
+        </thead>
         <tr *ngFor="let future of futures">
             <td>{{future.ID}}</td>
             <td>{{future.Symbol}}</td>
